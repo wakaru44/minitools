@@ -13,8 +13,10 @@
 COMMAND="ls -l"
 
 # where is the working dir
-WORK_DIR=~/tmp/foo
+WORK_DIR=/home/wakaru/src/github/minitools/monete/tmp/foo
 
+# who wants to know about this?
+EMAIL="wakaru44@gmail.com"
 
 function launch 
 {
@@ -27,6 +29,17 @@ function differ
 	diff -s $WORK_DIR/foo-$(date +%F).log $WORK_DIR/foo-base.log
 }
 
+function emailit
+{
+	# email subject
+	SUBJECT="Something happend with your thingy"
+	# Email text/message
+	EMAILMESSAGE="$WORK_DIR/foo-$(date +%F).log"
+	# send an email using systems mail command
+	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
+
+}
+
 launch
 if [ differ ]
 then
@@ -34,7 +47,7 @@ then
 else
 	echo "iguales"
 fi
-
+emailit
 
 
 
