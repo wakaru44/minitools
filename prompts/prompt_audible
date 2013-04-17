@@ -1,0 +1,36 @@
+\[\033[0;33m\][\!]`
+if [[ $? = 0 ]];
+then
+		function hablar {
+
+			NUM=$RANDOM
+			RANGE=10
+			let "NUM %= $RANGE"
+			typeset FRASES[10]  
+			FRASES[0]="And now?"
+			FRASES[1]="let me help you!"
+			FRASES[2]="How about a nice game of chess?"
+			FRASES[3]="yes master?"
+			FRASES[4]="I hear"
+			FRASES[6]="you say"
+			FRASES[5]="something?"
+			FRASES[7]="I'll do it!"
+			FRASES[8]="Here to serve"
+			FRASES[9]="Thank you, David"
+
+			espeak -p 10 "${FRASES[$NUM]}" 2>/dev/null
+		}
+	espeak -p 10 "ok" 2>/dev/null
+	echo \[\033[0m\];
+	echo \W;
+	echo "yes master? $"
+	hablar 
+else
+		function hablar {
+			espeak -p 10 "$1" 2>/dev/null
+		}
+	echo \[\033[31m\];
+	echo \W;
+	echo "Sorry master. It was a $? code"
+	hablar "Sorry master. It was a $? code"
+fi`\[\033[0m\] 
