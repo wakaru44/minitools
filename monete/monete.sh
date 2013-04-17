@@ -9,6 +9,32 @@
 # 4.- envia el email alertando (a. si es distinta de la salida anterior)
 
 
-COMANDO="ls -l"
+# Command to launch
+COMMAND="ls -l"
+
+# where is the working dir
+WORK_DIR=~/tmp/foo
+
+
+function launch 
+{
+	#bash $DEBUG $COMMAND > $WORKDIR/exec-$(date +%F).dat
+	$COMMAND > $WORK_DIR/foo-$(date +%F).log
+}
+
+function differ
+{
+	diff -s $WORK_DIR/foo-$(date +%F).log $WORK_DIR/foo-base.log
+}
+
+launch
+if [ differ ]
+then
+	echo "difiere"
+else
+	echo "iguales"
+fi
+
+
 
 
