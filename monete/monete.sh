@@ -37,7 +37,7 @@ EMAIL="wakaru44@gmail.com"
 function launch 
 {
 	#bash $DEBUG $COMMAND > $WORKDIR/exec-$(date +%F).dat
-	$COMMAND > $WORK_DIR/foo-$(date +%F).log
+	$1 > $WORK_DIR/foo-$(date +%F).log
 }
 
 function differ
@@ -51,6 +51,7 @@ function emailit
 	SUBJECT="Something happend with your thingy"
 	# Email text/message
 	EMAILMESSAGE="$WORK_DIR/foo-$(date +%F).log"
+	#TODO: improve timestamp to reflect minutes
 	# send an email using systems mail command
 	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 
@@ -61,16 +62,22 @@ function prepare_environment
 
 	if [ -e $WORK_DIR ]
 	then
-		echo "directory exists"
+		echo "Work directory: $WORK_DIR"
 	else
 		echo "directory nonexistant"
+		echo "$(date +%F) - directory nonexistant" >> $MONLOG
 		echo "Creating work directory:  $WORK_DIR"
+		echo "$(date +%F) - Creating work directory:  $WORK_DIR" >> $MONLOG
 		#TODO: ask for confirmation
 		mkdir -p $WORK_DIR
 	fi
 
+	#TODO: check also log for existant base file
+	#TODO: check also 
+
 }
 
+MONLOG=$WORK_DIR/monete.log
 
 ##############################
 #	Actual Script ;)
@@ -79,16 +86,16 @@ function prepare_environment
 # check the working dir and so
 prepare_environment
 # launch a comand
-launch
+launch $COMMAND
 # test the output
 if [ differ ]
 then
-	echo "difiere"
+	echo "$(date +%F) - Output changed. Sending email" >> $MONLOG
+	# and notify
+	emailit
 else
-	echo "iguales"
+	echo "$(date +%F) - Output hasn't changed, so doing nothing" >> $MONLOG
 fi
-# and notify
-emailit
 
 
 
