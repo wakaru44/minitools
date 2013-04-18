@@ -21,13 +21,13 @@ COMMAND="ls -l"
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
 # 	remember to give write permissions ;)
-WORK_DIR=/home/wakaru/src/minitools/monete/tmp/foo
+WORK_DIR=~/Developers/minitools/monete/tmp/foo
 
 # who wants to know about this?
 #	Email address to notify. 
 #	Be sure to have enabled outgoing mail
 # 	and mailutils installed
-EMAIL="wakaru44@gmail.com"
+EMAIL="davidaguileragomez@gmail.com"
 
 
 ##############################
