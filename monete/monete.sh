@@ -36,16 +36,18 @@ EMAIL="wakaru44@gmail.com"
 
 # where to log the scripts own activity
 MONLOG=$WORK_DIR/monete.log
+# The timestamp must be calculated once per launch
+$TIMESTAMP=$(date +%F-%H-%M)
 
 function launch 
 {
-	#bash $DEBUG $COMMAND > $WORKDIR/exec-$(date +%F).dat
-	$1 > $WORK_DIR/foo-$(date +%F).log
+	#bash $DEBUG $COMMAND > $WORKDIR/exec-$TIMESTAMP.dat
+	$1 > $WORK_DIR/foo-$TIMESTAMP.log
 }
 
 function differ
 {
-	diff -s $WORK_DIR/foo-$(date +%F).log $WORK_DIR/foo-base.log
+	diff -s $WORK_DIR/foo-$TIMESTAMP.log $WORK_DIR/foo-base.log
 }
 
 function emailit
@@ -53,12 +55,12 @@ function emailit
 	# email subject
 	SUBJECT="Something happend with your thingy"
 	# Email text/message
-	EMAILMESSAGE="$WORK_DIR/foo-$(date +%F).log"
-	#TODO: improve timestamp to reflect minutes
+	EMAILMESSAGE="$WORK_DIR/foo-$TIMESTAMP.log"
 	# send an email using systems mail command
 	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 
 }
+
 
 function prepare_environment
 {
@@ -66,14 +68,11 @@ function prepare_environment
 	if [ -e $WORK_DIR ]
 	then
 		echo "Work directory: $WORK_DIR"
-		echo "$(date +%F) - Work directory: $WORK_DIR" >> $MONLOG
+		echo "$TIMESTAMP - Work directory: $WORK_DIR" >> $MONLOG
 	else
 		echo "directory nonexistant"
-		echo "$(date +%F) - directory nonexistant" >> $MONLOG
-		echo "Creating work directory:  $WORK_DIR"
-		echo "$(date +%F) - Creating work directory:  $WORK_DIR" >> $MONLOG
-		#TODO: ask for confirmation
-		mkdir -p $WORK_DIR
+		echo "$TIMESTAMP - directory nonexistant" >> $MONLOG
+		create_work_dir
 	fi
 
 	#TODO: check also log for existant base file
@@ -82,22 +81,37 @@ function prepare_environment
 }
 
 
+function create_work_dir
+{
+	while true; do
+		read -p "Do you wish to create the work dir?" yn
+		case $yn in
+			[Yy]* ) echo "Creating work directory:  $WORK_DIR"
+				echo "$TIMESTAMP - Creating work directory:  $WORK_DIR" >> $MONLOG
+				#DEACTIVATED mkdir -p $WORK_DIR
+				echo "fake create"
+				break;;
+			[Nn]* ) exit;;
+			* ) echo "Please answer yes or no.";;
+		esac
+	done
+}
 ##############################
 #	Actual Script ;)
 ##############################
 
-# check the working dir and so
+# check the working dir and s
 prepare_environment
 # launch a comand
-launch $COMMAND
+#DEACTIVATED launch $COMMAND
 # test the output
 if [ differ ]
 then
-	echo "$(date +%F) - Output changed. Sending email" >> $MONLOG
+	echo "$TIMESTAMP - Output changed. Sending email" >> $MONLOG
 	# and notify
-	emailit
+	#DEACTIVATED  emailit
 else
-	echo "$(date +%F) - Output hasn't changed, so doing nothing" >> $MONLOG
+	echo "$TIMESTAMP - Output hasn't changed, so doing nothing" >> $MONLOG
 fi
 
 
