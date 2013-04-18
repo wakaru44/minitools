@@ -96,7 +96,7 @@ function create_work_dir
 				break;;
 			Home ) 
 				echo "Use the Home"
-				# TODO: change to the default dir
+				# And we have to update all the location variables
 				WORK_DIR=~
 				MONLOG=$WORK_DIR/monete.log
 				break;;
