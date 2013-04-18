@@ -88,17 +88,18 @@ function create_work_dir
 	echo "Do you wish to install this program?"
 	select yn in "Yes" "No"; do
 		case $yn in
-			Yes ) make install;
-			echo "Creating work directory:  $WORK_DIR"
-			break;;
-			No ) exit;;
-		esac
-	done
-				[Yy]* ) echo "Creating work directory:  $WORK_DIR"
+			Yes ) 
+				echo "Creating work directory:  $WORK_DIR"
 				echo "$TIMESTAMP - Creating work directory:  $WORK_DIR" >> $MONLOG
 				#DEACTIVATED mkdir -p $WORK_DIR
 				echo "fake create"
-	
+				break;;
+			Home ) 
+				echo "Use the Home"
+				# TODO: change to the default dir
+			No ) echo "Exiting. fix that and try again." ; exit;;
+		esac
+	done
 }
 ##############################
 #	Actual Script ;)
