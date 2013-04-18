@@ -114,5 +114,3 @@ else
 	echo "$TIMESTAMP - Output hasn't changed, so doing nothing" >> $MONLOG
 fi
 
-
-
