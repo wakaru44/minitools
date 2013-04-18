@@ -1,0 +1,13 @@
+\[\033[0;33m\][\!]`
+if [[ $? = 0 ]]; then
+	echo \[\033[0m\];
+else
+	echo \[\033[31m\];
+fi`
+[`
+if [[ 13 > 18 ]]; then
+	echo \W;
+else
+	echo \w;
+fi`]
+$\[\033[0m\] 
