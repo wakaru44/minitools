@@ -20,7 +20,6 @@
 #	one situation that you want to be alerted for and
 #	when you not
 COMMAND="monitors/process.sh apache"
-#TODO: check the execution dir, using basename
 
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
@@ -42,7 +41,8 @@ EMAIL="wakaru44@gmail.com"
 MONLOG=$WORK_DIR/monete.log
 # The timestamp must be calculated once per launch
 TIMESTAMP=$(date +%F-%H-%M)
-
+# where is the script living?
+RUN_DIR=$(dirname $0)
 
 function check_runing_mode
 {
@@ -55,12 +55,14 @@ then
 	if [ $1 == "test" ]
 	then
 		echo "Testing mode"
-		WORK_DIR=tmp
+		WORK_DIR=tests
 
 		# insert Test: TODO
 		test_differ
 
 		test_is_the_same
+
+		test_emailit
 
 		#TODO: test if the check of the command is done properly
 
@@ -82,10 +84,12 @@ function test_differ
 		# 1.- que compare dos iguales y diga que iguales
 		echo "Comparing two identical files"
 		differ $WORK_DIR/monete-command-igual.log $WORK_DIR/monete-command-base.log
+		echo $?
 
 		# 2.- que comparre dos distintos y diga distintos
-		echo "Compare different files should show differences"
+		echo "Compare different files should say they differ"
 		differ $WORK_DIR/monete-command-distinto.log $WORK_DIR/monete-command-base.log
+		echo $?
 
 
 }
@@ -96,6 +100,19 @@ function test_is_the_same
 	# TODO
 
 	echo "TODO"
+}
+
+function test_emailit
+{
+	echo "Testing Email sending with monete" > $WORK_DIR/deadletter
+	echo "Monete is a simple monitoring tool" >> $WORK_DIR/deadletter
+	EMAILMESSAGE="$WORK_DIR/deadletter"
+	SUBJECT="Monete - Monitoring tool test"
+
+	# send a test email
+	echo "emailit should send a testing message"
+	emailit "$SUBJECT" "$EMAILMESSAGE"
+
 }
 
 ##############################
@@ -134,15 +151,29 @@ function is_the_same
 	echo "foo"
 }
 
-function emailit
+
+function emailalert
 {
 	# email subject
 	SUBJECT="Something happend with your thingy"
 	# Email text/message
 	EMAILMESSAGE="$WORK_DIR/monete-command-$TIMESTAMP.log"
-	# send an email using systems mail command
-	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 
+	emailit $SUBJECT $EMAILMESSAGE
+}
+
+
+function emailit
+{
+	# receives $SUBJECT $EMAILMESSAGE
+	# email subject
+	SUBJECT=$1
+	# Email text/message
+	EMAILMESSAGE=$2
+	# send an email using systems mail command
+	echo $SUBJECT
+	echo $( cat $EMAILMESSAGE )
+	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
 }
 
 
@@ -230,7 +261,7 @@ if [ $? -eq 1 ]
 then
 	echo "$TIMESTAMP - Sending email" >> $MONLOG
 	# and notify
-	emailit
+	emailalert
 else
 	echo "$TIMESTAMP - Checked" >> $MONLOG
 fi
