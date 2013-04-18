@@ -7,6 +7,9 @@
 # 2.- compara esa salida con un archivo
 # 3.- detecta si hay diferencias
 # 4.- envia el email alertando (a. si es distinta de la salida anterior)
+# ES_
+# por ahora, compara la salida con un archivo base, y si difiere, envia un correo.
+# hay que hacer que compare con la ULTIMA ejecucion, para el segundo modo de funcionamiento.
 
 ##############################
 #	Configuration
@@ -57,6 +60,8 @@ then
 		# insert Test: TODO
 		test_differ
 
+		test_is_the_same
+
 		#TODO: test if the check of the command is done properly
 
 		#TODO: check the process "monitor"
@@ -85,12 +90,20 @@ function test_differ
 
 }
 
+function test_is_the_same
+{
+	# we need to check if this can take the decision when the output actually changed. HOW?
+	# TODO
+
+	echo "TODO"
+}
+
 ##############################
 
 function launch 
 {
 	#bash $DEBUG $COMMAND > $WORKDIR/exec-$TIMESTAMP.dat
-	$1 > $WORK_DIR/monete-command-$TIMESTAMP.log
+	"$@" > $WORK_DIR/monete-command-$TIMESTAMP.log
 }
 
 
@@ -98,7 +111,8 @@ function differ
 {
 	#diff -s $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
 	#we can parametrize this! ;)
-	diff -s $1 $2
+	echo "-----------------" >> $MONLOG
+	diff -s $1 $2 >> $MONLOG
 }
 
 
@@ -106,7 +120,7 @@ function is_the_same
 {
 	# A function to decide if we should warn or not
 	differ $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
-	if [ $? ]
+	if [ $? -eq 1  ]
 	then
 		echo "$TIMESTAMP - Output changed." 
 		echo "$TIMESTAMP - Output changed." >> $MONLOG
@@ -212,7 +226,7 @@ prepare_environment
 launch $COMMAND
 # test the output
 is_the_same  
-if [ ! $? ]
+if [ $? -eq 1 ]
 then
 	echo "$TIMESTAMP - Sending email" >> $MONLOG
 	# and notify
