@@ -84,7 +84,17 @@ function prepare_environment
 
 function create_work_dir
 {
-			[Yy]* ) echo "Creating work directory:  $WORK_DIR"
+
+	echo "Do you wish to install this program?"
+	select yn in "Yes" "No"; do
+		case $yn in
+			Yes ) make install;
+			echo "Creating work directory:  $WORK_DIR"
+			break;;
+			No ) exit;;
+		esac
+	done
+				[Yy]* ) echo "Creating work directory:  $WORK_DIR"
 				echo "$TIMESTAMP - Creating work directory:  $WORK_DIR" >> $MONLOG
 				#DEACTIVATED mkdir -p $WORK_DIR
 				echo "fake create"
