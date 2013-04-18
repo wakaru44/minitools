@@ -37,7 +37,7 @@ EMAIL="wakaru44@gmail.com"
 # where to log the scripts own activity
 MONLOG=$WORK_DIR/monete.log
 # The timestamp must be calculated once per launch
-$TIMESTAMP=$(date +%F-%H-%M)
+TIMESTAMP=$(date +%F-%H-%M)
 
 function launch 
 {
