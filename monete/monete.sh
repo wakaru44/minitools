@@ -27,7 +27,7 @@ WORK_DIR=/home/wakaru/src/minitools/monete/tmp/foo
 #	Email address to notify. 
 #	Be sure to have enabled outgoing mail
 # 	and mailutils installed
-EMAIL="wakaru44@gmail.com"
+EMAIL="davidaguileragomez@gmail.com"
 
 
 ##############################
