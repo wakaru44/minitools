@@ -21,7 +21,7 @@ COMMAND="ls -l"
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
 # 	remember to give write permissions ;)
-WORK_DIR=/home/wakaru/src/github/minitools/monete/tmp/foo
+WORK_DIR=/home/wakaru/src/minitools/monete/tmp/foo
 
 # who wants to know about this?
 #	Email address to notify. 
@@ -33,6 +33,9 @@ EMAIL="wakaru44@gmail.com"
 ##############################
 #	The inner magic
 ##############################
+
+# where to log the scripts own activity
+MONLOG=$WORK_DIR/monete.log
 
 function launch 
 {
@@ -63,6 +66,7 @@ function prepare_environment
 	if [ -e $WORK_DIR ]
 	then
 		echo "Work directory: $WORK_DIR"
+		echo "$(date +%F) - Work directory: $WORK_DIR" >> $MONLOG
 	else
 		echo "directory nonexistant"
 		echo "$(date +%F) - directory nonexistant" >> $MONLOG
@@ -77,7 +81,6 @@ function prepare_environment
 
 }
 
-MONLOG=$WORK_DIR/monete.log
 
 ##############################
 #	Actual Script ;)
