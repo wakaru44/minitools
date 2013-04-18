@@ -37,7 +37,7 @@ EMAIL="wakaru44@gmail.com"
 # where to log the scripts own activity
 MONLOG=$WORK_DIR/monete.log
 # The timestamp must be calculated once per launch
-$TIMESTAMP=$(date +%F-%H-%M)
+TIMESTAMP=$(date +%F-%H-%M)
 
 function launch 
 {
@@ -68,10 +68,9 @@ function prepare_environment
 	if [ -e $WORK_DIR ]
 	then
 		echo "Work directory: $WORK_DIR"
-		echo "$TIMESTAMP - Work directory: $WORK_DIR" >> $MONLOG
+		echo "$TIMESTAMP - INFO - Work directory: $WORK_DIR" >> $MONLOG
 	else
-		echo "directory nonexistant"
-		echo "$TIMESTAMP - directory nonexistant" >> $MONLOG
+		echo "$TIMESTAMP - WARNING!! - directory nonexistant" >> $MONLOG
 		# create the directory, asking for confirmation
 		create_work_dir
 	fi
@@ -85,18 +84,22 @@ function prepare_environment
 function create_work_dir
 {
 
-	echo "Do you wish to install this program?"
-	select yn in "Yes" "No"; do
+	echo "The work directory does not exists. Create it?"
+	echo " Or create a new dir in the users home?"
+	select yn in "Yes" "No" "Home"; do
 		case $yn in
 			Yes ) 
 				echo "Creating work directory:  $WORK_DIR"
-				echo "$TIMESTAMP - Creating work directory:  $WORK_DIR" >> $MONLOG
+				echo "$TIMESTAMP - INFO - Creating work directory:  $WORK_DIR" >> $MONLOG
 				#DEACTIVATED mkdir -p $WORK_DIR
 				echo "fake create"
 				break;;
 			Home ) 
 				echo "Use the Home"
 				# TODO: change to the default dir
+				WORK_DIR=~
+				MONLOG=$WORK_DIR/monete.log
+				break;;
 			No ) echo "Exiting. fix that and try again." ; exit;;
 		esac
 	done
