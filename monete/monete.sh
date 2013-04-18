@@ -71,7 +71,7 @@ function prepare_environment
 		echo "$TIMESTAMP - Work directory: $WORK_DIR" >> $MONLOG
 	else
 		echo "directory nonexistant"
-		echo "$TIMESTAMP - directory nonexistant" >> $MONLOG
+		echo "$TIMESTAMP - directory nonexistant"
 		create_work_dir
 	fi
 
