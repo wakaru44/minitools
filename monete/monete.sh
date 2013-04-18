@@ -57,6 +57,10 @@ then
 		# insert Test: TODO
 		test_differ
 
+		#TODO: test if the check of the command is done properly
+
+		#TODO: check the process "monitor"
+
 		exit
 	else
 		echo "Normal operation"
