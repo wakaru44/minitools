@@ -16,12 +16,13 @@
 # 	Try to get an output that will distinguish betwen
 #	one situation that you want to be alerted for and
 #	when you not
-COMMAND="ls -l"
+COMMAND="monitors/process.sh apache"
+#TODO: check the execution dir, using basename
 
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
 # 	remember to give write permissions ;)
-WORK_DIR=/tmp/monete
+WORK_DIR=tmp
 
 # who wants to know about this?
 #	Email address to notify. 
@@ -39,15 +40,80 @@ MONLOG=$WORK_DIR/monete.log
 # The timestamp must be calculated once per launch
 TIMESTAMP=$(date +%F-%H-%M)
 
+
+function check_runing_mode
+{
+
+
+
+if [ $1 ]
+then
+
+	if [ $1 == "test" ]
+	then
+		echo "Testing mode"
+		WORK_DIR=tmp
+
+		# insert Test: TODO
+		test_differ
+
+		exit
+	else
+		echo "Normal operation"
+	fi
+
+fi
+
+
+}
+
+function test_differ
+{
+
+		# 1.- que compare dos iguales y diga que iguales
+		echo "Comparing two identical files"
+		differ $WORK_DIR/monete-command-igual.log $WORK_DIR/monete-command-base.log
+
+		# 2.- que comparre dos distintos y diga distintos
+		echo "Compare different files should show differences"
+		differ $WORK_DIR/monete-command-distinto.log $WORK_DIR/monete-command-base.log
+
+
+}
+
+##############################
+
 function launch 
 {
 	#bash $DEBUG $COMMAND > $WORKDIR/exec-$TIMESTAMP.dat
 	$1 > $WORK_DIR/monete-command-$TIMESTAMP.log
 }
 
-function differ
+
+function differ 
 {
-	diff -s $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
+	#diff -s $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
+	#we can parametrize this! ;)
+	diff -s $1 $2
+}
+
+
+function is_the_same
+{
+	# A function to decide if we should warn or not
+	differ $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
+	if [ $? ]
+	then
+		echo "$TIMESTAMP - Output changed." 
+		echo "$TIMESTAMP - Output changed." >> $MONLOG
+		return 0
+	else
+		echo "$TIMESTAMP - Output hasn't changed, so doing nothing"
+		echo "$TIMESTAMP - Output hasn't changed, so doing nothing" >> $MONLOG
+		return 1
+	fi
+	#$WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
+	echo "foo"
 }
 
 function emailit
@@ -64,6 +130,8 @@ function emailit
 
 function prepare_environment
 {
+	#TODO:  check if the command exists
+	#TODO:  check if there is a base.log file to compare to ( if not, diff asumes none)
 
 	# check the work dir
 	if [ -e $WORK_DIR ]
@@ -85,6 +153,17 @@ function prepare_environment
 		echo "Starting logging" >> $MONLOG
 		
 	fi
+
+	# check the base file
+	if [ -e $MONLOG ]
+	then
+		echo "Base File Exists" >> $MONLOG
+	else
+		echo "$TIMESTAMP - WARNING!!! - No Base File exits" >> $MONLOG
+		
+	fi
+
+
 
 
 }
@@ -114,22 +193,28 @@ function create_work_dir
 		esac
 	done
 }
+
+
 ##############################
 #	Actual Script ;)
 ##############################
 
-# check the working dir and s
+# We can run in "test" mode, or normal mode. 
+#@ to use the test mode, launch the command "monete.sh test"
+check_runing_mode  $1
+# check the working dir and other stuf
 prepare_environment
-# launch a comand
+# launch the comand
 launch $COMMAND
 # test the output
-if [ differ ]
+is_the_same  
+if [ ! $? ]
 then
-	echo "$TIMESTAMP - Output changed. Sending email" >> $MONLOG
+	echo "$TIMESTAMP - Sending email" >> $MONLOG
 	# and notify
 	emailit
 else
-	echo "$TIMESTAMP - Output hasn't changed, so doing nothing" >> $MONLOG
+	echo "$TIMESTAMP - Checked" >> $MONLOG
 fi
 
 
