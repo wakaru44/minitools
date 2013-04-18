@@ -84,7 +84,7 @@ function prepare_environment
 function create_work_dir
 {
 	while true; do
-		read -p "Do you wish to create the work dir?" yn
+		read -p "Do you wish to create the work dir? (Y/N):" yn
 		case $yn in
 			[Yy]* ) echo "Creating work directory:  $WORK_DIR"
 				echo "$TIMESTAMP - Creating work directory:  $WORK_DIR" >> $MONLOG
