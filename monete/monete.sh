@@ -72,6 +72,7 @@ function prepare_environment
 	else
 		echo "directory nonexistant"
 		echo "$TIMESTAMP - directory nonexistant" >> $MONLOG
+		# create the directory, asking for confirmation
 		create_work_dir
 	fi
 
@@ -83,18 +84,11 @@ function prepare_environment
 
 function create_work_dir
 {
-	while true; do
-		read -p "Do you wish to create the work dir?" yn
-		case $yn in
 			[Yy]* ) echo "Creating work directory:  $WORK_DIR"
 				echo "$TIMESTAMP - Creating work directory:  $WORK_DIR" >> $MONLOG
 				#DEACTIVATED mkdir -p $WORK_DIR
 				echo "fake create"
-				break;;
-			[Nn]* ) exit;;
-			* ) echo "Please answer yes or no.";;
-		esac
-	done
+	
 }
 ##############################
 #	Actual Script ;)
