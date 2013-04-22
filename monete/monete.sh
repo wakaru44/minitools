@@ -19,12 +19,12 @@
 # 	Try to get an output that will distinguish betwen
 #	one situation that you want to be alerted for and
 #	when you not
-COMMAND="monitors/process.sh apache"
+COMMAND="ls -lR /servers/instaladoresrepo/backups/basesDeDatos/autobackups"
 
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
 # 	remember to give write permissions ;)
-WORK_DIR=tmp
+WORK_DIR=~/monitore
 
 # who wants to know about this?
 #	Email address to notify. 
@@ -167,7 +167,7 @@ function emailalert
 	# Email text/message
 	EMAILMESSAGE="$WORK_DIR/monete-command-$TIMESTAMP.log"
 
-	emailit $SUBJECT $EMAILMESSAGE
+	emailit "$SUBJECT" "$EMAILMESSAGE"
 }
 
 
@@ -179,9 +179,9 @@ function emailit
 	# Email text/message
 	EMAILMESSAGE=$2
 	# send an email using systems mail command
-	echo $SUBJECT
-	echo $( cat $EMAILMESSAGE )
-	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
+	echo "$SUBJECT"
+	echo "$( cat $EMAILMESSAGE )"
+	mail -s "$SUBJECT" "$EMAIL" < "$EMAILMESSAGE"
 }
 
 
