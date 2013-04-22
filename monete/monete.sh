@@ -145,25 +145,29 @@ function is_the_same
 {
 	# A function to decide if we should warn or not
 	differ $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
+	if [ $? -eq 2  ]
+	then
+		echo "$TMESTAMP - One of the files does not exists"
+		return 1
+	fi
 	if [ $? -eq 1  ]
 	then
 		echo "$TIMESTAMP - Output changed." 
 		echo "$TIMESTAMP - Output changed." >> $MONLOG
-		return 0
+		return 1
 	else
 		echo "$TIMESTAMP - Output hasn't changed, so doing nothing"
 		echo "$TIMESTAMP - Output hasn't changed, so doing nothing" >> $MONLOG
-		return 1
+		return 0
 	fi
 	#$WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
-	echo "foo"
 }
 
 
 function emailalert
 {
 	# email subject
-	SUBJECT="Something happend with your thingy"
+	SUBJECT="Something happend in $(hostname)"
 	# Email text/message
 	EMAILMESSAGE="$WORK_DIR/monete-command-$TIMESTAMP.log"
 
