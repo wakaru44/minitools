@@ -92,6 +92,10 @@ class MonitorClass(BaseClass):
         """arranca las herramientas de monito"""
         pass
 
+    def getLog(self):
+        """recoge el archivo y lo trae a local"""
+        pass  #TODO
+
 
 class dstat(MonitorClass):
     """ controla dstat """
@@ -101,20 +105,22 @@ class dstat(MonitorClass):
 
     def lanzar(self):
         """lo arranca y guarda el log ¿y un pid?"""
-        #run("dtach -n `mktemp -u /tmp/{logf} dstat") # needs install
-        result = run("nohup dstat > /tmp/{logfile} &".format(logfile=self.logfile))
-        print result
+        #TODO: hacer que lance esta mierda contra un log en el workdir
+        #result = run("dtach -n `mktemp -u /tmp/{logf} dstat") # needs install
+        print "Lanzando dstat"
+        monlog = os.path.join(self.work_dir, self.logfile)
+        comando = "nohup dstat > {logfile} &".format(logfile=monlog)
+        print(repr( comando))
+        result = run(comando, pty = False)  #it needs pty=F. see fabric issue:
+                # https://github.com/fabric/fabric/issues/395
 
 
+        print "el monitor es ", result
 
-    def getLog(self):
-        """recoge el archivo y lo trae a local"""
-        pass  #TODO
 
     def stopMonitor(self):
         """stop the monitor command"""
-        pass #TODO: find a way to kill it
-        #run("pkill dstat")
+        run("pkill -f dstat")
 
     def parar(self):
         """se encarga de parar el dstat, y recoger el log"""
@@ -132,8 +138,8 @@ def definir_prueba():
     #- como una lista de parametros ¿Dic?
     params = []
     #- por ahora, unaprueba a cambiar el num de conexiones de un httperf
-    p1={"cons": 10}
-    p2={"cons": 5}
+    p1={"cons": 1}
+    p2={"cons": 2}
     params = [p1, p2]
 
 
@@ -142,25 +148,34 @@ def definir_prueba():
 
 def preparar_monitores():
     """ se encarga de tirar las herramientas de monitorizacion"""
-    tool1="dstat"
-    #TODO: hacer que lance esta mierda contra un log en el workdir
+    print "preparando monitores"
     monito1 = dstat()
     monito1.lanzar()
     try:
-        run("ps -ef | grep -v grep | grep dstat")
+        result = run("ps -ef | grep -v grep | grep dstat")
+        if result.failed:
+            print "parece que no se lanzo"
+        else:
+            print "Se ha lanzado DSTAT"
     except:
         pass
-    monito1.stopMonitor()
+
+def parar_monitores(monitores = []):
+    """para todos los monitores configurados para la prueba"""
+    print "parando monitores"
+    for monitor in monitores:
+        monitor.stopMonitor()
+        monitor.getLog()
 
 
 def lanzar_prueba(prueba, params=None):
     """tira una prueba con los parametros recibidos"""
-    #TODO: delete
+    #TODO: delete fake dict
     params = {"server": "tri.poli.nom.es",
-              "cons": 5
+              "cons": 2
              }
     command = """httperf --hog --server={server} --wsess={cons},2,2 --rate=1 --timeout 5""".format(**params)
-    prueba.addCommand("""httperf --hog --server={server} --wsess={cons},2,2 --rate=1 --timeout 5""".format(**params))
+    prueba.addCommand("""httperf --hog --server={server} --wsess={cons},2,1 --rate=1 --timeout 5""".format(**params))
     print "prueba a lanzar"
     print(command)
     prueba.lanzar()
@@ -170,10 +185,7 @@ def lanzar_prueba(prueba, params=None):
 def log_algo(archivo = "~/benchmarking/pruebas01/command.log",
              thingtolog = "Estas intentando loguear algo..."
             ):
-    if contrib.files.exists(archivo):
-        contrib.files.append(archivo, thingtolog)
-    else:
-        raise Exception("Joder, no hay directorio")
+    contrib.files.append(archivo, thingtolog)
 
 def lanzar_todo():
     prueba = PruebaClass()
@@ -211,6 +223,5 @@ ALgo de documentacion:
         QUESTION: que preferimos, que lance un monitor por cada comando que
         lanza, o que guarde toda la monitorizacion de una prueba en la misma
         carpeta???
-
 
 """
