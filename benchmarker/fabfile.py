@@ -109,9 +109,10 @@ class dstat(MonitorClass):
         #result = run("dtach -n `mktemp -u /tmp/{logf} dstat") # needs install
         print "Lanzando dstat"
         monlog = os.path.join(self.work_dir, self.logfile)
-        comando = "nohup dstat > {logfile} &".format(logfile=monlog)
+        comando = "nohup dstat > {logfile} & sleep 5; exit 0".format(logfile=monlog)
         print(repr( comando))
-        result = run(comando, pty = False)  #it needs pty=F. see fabric issue:
+        result = run(comando) # a simple sleep seems to fix the issue
+        #result = run(comando, pty = False)  #it needs pty=F. see fabric issue:
                 # https://github.com/fabric/fabric/issues/395
 
 
@@ -197,6 +198,9 @@ def lanzar_todo():
     lanzar_prueba(prueba, params) # lanzarlo asi
                     # quiza es un poco lioso. mejor
                     # agruparlo todo en el metodo como dios manda.
+
+
+    #TODO: limpiar()  #algo que limpie joder
 
 
 
