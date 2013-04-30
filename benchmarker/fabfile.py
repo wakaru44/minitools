@@ -16,7 +16,14 @@ from fabric.api import *
 from fabric import contrib
 from fabtools import *
 
-env.hosts = ["wakaru@localhost"]
+#env.hosts = ["root@portalauchanv1.test.alcampo.es:23"]
+env.roledefs.update({
+    "webserver": ['root@portalauchanv1.test.alcampo.es:23'],
+    "jmeter": ['jmorales@localhost'],
+    "bbdd": ['root@bbdd.alcampo.es:24']
+    })
+
+#'root@jmeter.alcampo.es:25',   # La dejo por aqui para cambiarla por el mio
 
 #TODO: definir roles para los hosts
 
@@ -65,16 +72,17 @@ class PruebaClass(BaseClass):
     #TODO: definir el rol de este metodo a local/bench
     def lanzar(self):
         """tira la prueba en si"""
-        for command in self.commands:
-            print "lanzando:"
-            print command
-            try:
-                result = run(command)
-                self.save_log(result)
-            except Exception as e:
-                print "shit happends"
-                print result
-                self.save_log(result)
+        with settings(warn_only=True):
+            for command in self.commands:
+                print "lanzando:"
+                print command
+                try:
+                    result = run(command)
+                    self.save_log(result)
+                except Exception as e:
+                    print "shit happends"
+                    print result
+                    self.save_log(result)
 
     def parar(self):
         """acciones necesarias para parar la prueba"""
@@ -139,14 +147,17 @@ def definir_prueba():
     #- como una lista de parametros ¿Dic?
     params = []
     #- por ahora, unaprueba a cambiar el num de conexiones de un httperf
-    p1={"cons": 1}
-    p2={"cons": 2}
-    params = [p1, p2]
+    prueba1 = {"cons": 2 }
+    prueba2 = {"cons": 4 }
+    params = [prueba1, prueba2]
+    for prueba in params:
+        prueba["server"] = "portalauchanv1.test.alcampo.es:8095"
 
 
     return params
 
 
+@roles("webserver")
 def preparar_monitores():
     """ se encarga de tirar las herramientas de monitorizacion"""
     print "preparando monitores"
@@ -158,9 +169,12 @@ def preparar_monitores():
             print "parece que no se lanzo"
         else:
             print "Se ha lanzado DSTAT"
+            return [monito1]
     except:
         pass
 
+
+@roles("webserver")
 def parar_monitores(monitores = []):
     """para todos los monitores configurados para la prueba"""
     print "parando monitores"
@@ -169,12 +183,9 @@ def parar_monitores(monitores = []):
         monitor.getLog()
 
 
+@roles("jmeter")
 def lanzar_prueba(prueba, params=None):
     """tira una prueba con los parametros recibidos"""
-    #TODO: delete fake dict
-    params = {"server": "tri.poli.nom.es",
-              "cons": 2
-             }
     command = """httperf --hog --server={server} --wsess={cons},2,2 --rate=1 --timeout 5""".format(**params)
     prueba.addCommand("""httperf --hog --server={server} --wsess={cons},2,1 --rate=1 --timeout 5""".format(**params))
     print "prueba a lanzar"
@@ -194,11 +205,15 @@ def lanzar_todo():
     prueba.preparar()  # prepara el entorno. molan mas los metodos de este estilo
 
 
-    preparar_monitores()
-    lanzar_prueba(prueba, params) # lanzarlo asi
+    monitores = preparar_monitores()
+    print "Lanzando pruebas:"
+    for param in params:
+        print param
+        lanzar_prueba(prueba, param) # lanzarlo asi
                     # quiza es un poco lioso. mejor
                     # agruparlo todo en el metodo como dios manda.
 
+    parar_monitores(monitores)
 
     #TODO: limpiar()  #algo que limpie joder
 
@@ -227,5 +242,7 @@ ALgo de documentacion:
         QUESTION: que preferimos, que lance un monitor por cada comando que
         lanza, o que guarde toda la monitorizacion de una prueba en la misma
         carpeta???
+        - que se pueda lanzar desde mas de un host. por ahora la preparacion de
+        pruebas solo funciona en una sola maquina
 
 """
