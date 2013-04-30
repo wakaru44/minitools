@@ -24,7 +24,7 @@ COMMAND="ls -lR /servers/instaladoresrepo/backups/basesDeDatos/autobackups"
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
 # 	remember to give write permissions ;)
-WORK_DIR=~/monitore
+WORK_DIR="~/monitore"
 
 # who wants to know about this?
 #	Email address to notify. 
@@ -145,12 +145,13 @@ function is_the_same
 {
 	# A function to decide if we should warn or not
 	differ $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
-	if [ $? -eq 2  ]
+	RESULT=$?
+	if [ $RESULT -eq 2  ]
 	then
 		echo "$TMESTAMP - One of the files does not exists"
 		return 1
 	fi
-	if [ $? -eq 1  ]
+	if [ $RESULT -eq 1  ]
 	then
 		echo "$TIMESTAMP - Output changed." 
 		echo "$TIMESTAMP - Output changed." >> $MONLOG
