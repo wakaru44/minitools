@@ -19,12 +19,12 @@
 # 	Try to get an output that will distinguish betwen
 #	one situation that you want to be alerted for and
 #	when you not
-COMMAND="monitors/process.sh apache"
+COMMAND="ls -lR /servers/instaladoresrepo/backups/basesDeDatos/autobackups"
 
 # where is the working dir located?
 #	where the script will put all its working files and stamps.
 # 	remember to give write permissions ;)
-WORK_DIR=tmp
+WORK_DIR="~/monitore"
 
 # who wants to know about this?
 #	Email address to notify. 
@@ -55,14 +55,15 @@ then
 	if [ $1 == "test" ]
 	then
 		echo "Testing mode"
-		WORK_DIR=tests
+		WORK_DIR=$RUN_DIR/tests
+		MONLOG=$WORK_DIR/monete.log
 
 		# insert Test: TODO
-		test_differ
+		test_differ "$WORK_DIR"
 
-		test_is_the_same
+		test_is_the_same "$WORK_DIR"
 
-		test_emailit
+		test_emailit "$WORK_DIR"
 
 		#TODO: test if the check of the command is done properly
 
@@ -80,22 +81,28 @@ fi
 
 function test_differ
 {
+	WORK_DIR=$1
 
-		# 1.- que compare dos iguales y diga que iguales
-		echo "Comparing two identical files"
-		differ $WORK_DIR/monete-command-igual.log $WORK_DIR/monete-command-base.log
-		echo $?
+	# 1.- que compare dos iguales y diga que iguales
+	echo "Comparing two identical files"
+	echo "$WORK_DIR/monete-command-igual.log" 
+	echo "$WORK_DIR/monete-command-base.log"
+	differ "$WORK_DIR/monete-command-igual.log" "$WORK_DIR/monete-command-base.log"
+	echo $?
 
-		# 2.- que comparre dos distintos y diga distintos
-		echo "Compare different files should say they differ"
-		differ $WORK_DIR/monete-command-distinto.log $WORK_DIR/monete-command-base.log
-		echo $?
+	# 2.- que comparre dos distintos y diga distintos
+	echo "Compare different files should say they differ"
+	echo "$WORK_DIR/monete-command-distinto.log" 
+	echo "$WORK_DIR/monete-command-base.log"
+	differ "$WORK_DIR/monete-command-distinto.log" "$WORK_DIR/monete-command-base.log"
+	echo $?
 
 
 }
 
 function test_is_the_same
 {
+	WORK_DIR=$1
 	# we need to check if this can take the decision when the output actually changed. HOW?
 	# TODO
 
@@ -104,6 +111,7 @@ function test_is_the_same
 
 function test_emailit
 {
+	WORK_DIR=$1
 	echo "Testing Email sending with monete" > $WORK_DIR/deadletter
 	echo "Monete is a simple monitoring tool" >> $WORK_DIR/deadletter
 	EMAILMESSAGE="$WORK_DIR/deadletter"
@@ -137,29 +145,34 @@ function is_the_same
 {
 	# A function to decide if we should warn or not
 	differ $WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
-	if [ $? -eq 1  ]
+	RESULT=$?
+	if [ $RESULT -eq 2  ]
+	then
+		echo "$TMESTAMP - One of the files does not exists"
+		return 1
+	fi
+	if [ $RESULT -eq 1  ]
 	then
 		echo "$TIMESTAMP - Output changed." 
 		echo "$TIMESTAMP - Output changed." >> $MONLOG
-		return 0
+		return 1
 	else
 		echo "$TIMESTAMP - Output hasn't changed, so doing nothing"
 		echo "$TIMESTAMP - Output hasn't changed, so doing nothing" >> $MONLOG
-		return 1
+		return 0
 	fi
 	#$WORK_DIR/monete-command-$TIMESTAMP.log $WORK_DIR/monete-command-base.log
-	echo "foo"
 }
 
 
 function emailalert
 {
 	# email subject
-	SUBJECT="Something happend with your thingy"
+	SUBJECT="Something happend in $(hostname)"
 	# Email text/message
 	EMAILMESSAGE="$WORK_DIR/monete-command-$TIMESTAMP.log"
 
-	emailit $SUBJECT $EMAILMESSAGE
+	emailit "$SUBJECT" "$EMAILMESSAGE"
 }
 
 
@@ -171,9 +184,9 @@ function emailit
 	# Email text/message
 	EMAILMESSAGE=$2
 	# send an email using systems mail command
-	echo $SUBJECT
-	echo $( cat $EMAILMESSAGE )
-	mail -s "$SUBJECT" "$EMAIL" < $EMAILMESSAGE
+	echo "$SUBJECT"
+	echo "$( cat $EMAILMESSAGE )"
+	mail -s "$SUBJECT" "$EMAIL" < "$EMAILMESSAGE"
 }
 
 
