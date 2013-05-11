@@ -79,6 +79,21 @@ fi
 
 }
 
+########################################
+#	Unit Testing Functions
+########################################
+
+function assert_equal
+{
+	if [ $1 -eq $2 ]
+	then
+		echo "Ok"
+	else
+		echo "Fail"
+		echo "$1 not equal $2"
+	fi
+}
+
 function test_differ
 {
 	WORK_DIR=$1
@@ -89,6 +104,7 @@ function test_differ
 	echo "$WORK_DIR/monete-command-base.log"
 	differ "$WORK_DIR/monete-command-igual.log" "$WORK_DIR/monete-command-base.log"
 	echo $?
+	assert_equal $? 0
 
 	# 2.- que comparre dos distintos y diga distintos
 	echo "Compare different files should say they differ"
@@ -96,8 +112,7 @@ function test_differ
 	echo "$WORK_DIR/monete-command-base.log"
 	differ "$WORK_DIR/monete-command-distinto.log" "$WORK_DIR/monete-command-base.log"
 	echo $?
-
-
+	assert_equal $? 1
 }
 
 function test_is_the_same
@@ -120,17 +135,14 @@ function test_emailit
 	# send a test email
 	echo "emailit should send a testing message"
 	emailit "$SUBJECT" "$EMAILMESSAGE"
-
 }
 
 ##############################
-
 function launch 
 {
 	#bash $DEBUG $COMMAND > $WORKDIR/exec-$TIMESTAMP.dat
 	"$@" > $WORK_DIR/monete-command-$TIMESTAMP.log
 }
-
 
 function differ 
 {
