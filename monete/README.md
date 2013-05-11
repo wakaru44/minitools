@@ -35,3 +35,12 @@ We, have also created a few helping scripts called "monitors" that will help you
 If you need more documentation about a "monitor", check the file of it. Usually you call them with some param, and they handle the output.
 
 
+
+
+
+## Branches
+
+### Concomandos
+this development branch was created to write the code to support commands in the form of small scripts, that can build more complex commands, with simplified output, parseable by the monete.sh.
+
+
