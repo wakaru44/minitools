@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# the folder where we record our stuff
+RECORD_FOLDER="~"
+
+# The file template defines the beginning of the file
+FILETEMPLATE="cli_session"
+
+TIMESTAMP="$(date +%F)_$( date +%H:%M)"
+echo "I will start recording what you type now."
+
+script -s $RECORD_FOLDER/$FILE_TEMPLATE_$TIMESTAMP_output.log -t $RECORD_FOLDER/$FILE_TEMPLATE_$TIMESTAMP_timing.log
