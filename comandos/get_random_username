@@ -1,0 +1,4 @@
+#!/bin/bash
+# get a random username from the internet
+curl  https://randomuser.me/api/ 2>/dev/null | jq '.results[0]["login"]["username"]?'
+
